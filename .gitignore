@@ -28,6 +28,7 @@
 *.so.*
 *.dylib
 
+
 # Executables
 *.exe
 *.out
@@ -35,6 +36,8 @@
 *.i*86
 *.x86_64
 *.hex
+*
+!*/
 
 # Debug files
 *.dSYM/
@@ -50,3 +53,21 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+.DS_Store
+Lectures/.DS_Store
+.class
+
+/.idea
+/.vscode
+/obj
+
+# C/C++ Source Files (explicitly allow)
+!*.c
+!*.h
+!*.cpp
+!*.hpp
+
+!Makefile
+!README
+!CHANGELOG
