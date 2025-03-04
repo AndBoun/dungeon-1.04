@@ -36,8 +36,8 @@ int save(Dungeon *d){
     fwrite(&size, 4, 1, ls.f);
 
     // Write PC
-    uint8_t pc_x = (uint8_t)d->pc_x;
-    uint8_t pc_y = (uint8_t)d->pc_y;
+    uint8_t pc_x = (uint8_t)d->pc.x;
+    uint8_t pc_y = (uint8_t)d->pc.y;
     fwrite(&pc_x, 1, 1, ls.f);
     fwrite(&pc_y, 1, 1, ls.f);
 

@@ -11,15 +11,15 @@
 void init_dungeon(Dungeon *d) {
     d->rooms = NULL;
     d->num_rooms = 0;
-    d->current_room_idx = 0;
-    d->pc_x = 0;
-    d->pc_y = 0;
+
     d->num_up_stairs = 0;
     d->num_down_stairs = 0;
+
     d->up_stairs = NULL;
     d->down_stairs = NULL;
-    d->current_up_stair_idx = 0;
-    d->current_down_stair_idx = 0;
+
+    // initialize PC later
+    d->monsters = NULL;
 }
 
 bool generate_random_dungeon(Dungeon *d){
@@ -48,7 +48,6 @@ bool generate_random_dungeon(Dungeon *d){
         // Generate a random number of rooms to generate
         num_rooms = MIN_ROOMS + rand() % (MAX_ROOMS - MIN_ROOMS + 1);
         d->num_rooms = num_rooms;
-        d->current_room_idx = 0;
         // printf("Number of rooms: %d\n", num_rooms);
         d->rooms = malloc(num_rooms * sizeof(Room));
 
@@ -56,7 +55,7 @@ bool generate_random_dungeon(Dungeon *d){
         for (i = 0; i < num_rooms; i++) {
 
             // If attempt limit is reached, reset grid and try again
-            if (!generate_random_room(d)) {
+            if (!generate_random_room(d, i)) {
                 success = false;
                 break;
             }
@@ -104,8 +103,7 @@ int place_random_player(Dungeon *d){
         y = rand() % PLACABLE_HEIGHT + 1;
     } while (d->grid[y][x].type == CORRIDOR || d->grid[y][x].type == ROCK);
 
-    d->pc_x = x;
-    d->pc_y = y;
+    init_player(&d->pc, x, y);
     d->grid[y][x].type = PLAYER;
 
     return 1;

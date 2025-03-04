@@ -81,8 +81,7 @@ static int load_pc(LoadSave *ls, Dungeon *d) {
         fclose(ls->f);
         return 1;
     }
-    d->pc_x = (int) pc[0];
-    d->pc_y = (int) pc[1];
+    init_player(&d->pc, pc[0], pc[1]);
 
 
     return 0;
@@ -98,9 +97,9 @@ static int load_hardness(LoadSave *ls, Dungeon *d) {
         return 1;
     }
     for (int i = 0; i < 1680; i++){
-        FloorTile *ft = &d->grid[i / DUNGEON_WIDTH][i % DUNGEON_WIDTH];
-        ft->hardness = hardness[i];
-        ft->type = ROCK;
+        Cell *cell = &d->grid[i / DUNGEON_WIDTH][i % DUNGEON_WIDTH];
+        cell->hardness = hardness[i];
+        cell->type = ROCK;
     }
 
     return 0;
@@ -141,8 +140,6 @@ static int load_rooms(LoadSave *ls, Dungeon *d, int r){
 
         generate_room(d, d->rooms[i]);
     }
-
-    d->grid[d->pc_y][d->pc_x].type = PLAYER;
 
     return 0;
 }
@@ -256,7 +253,7 @@ int load(Dungeon *d){
     printf("Size: %u\n", size);
 
     load_pc(&ls, d); // player character
-    printf("PC: x: %u \t y: %u \n", d->pc_x, d->pc_y);
+    printf("PC: x: %u \t y: %u \n", d->pc.x, d->pc.y);
 
     load_hardness(&ls, d);
     // print_hardness_info(d);
@@ -285,7 +282,7 @@ int load(Dungeon *d){
     fill_in_corridors(d);
     // print_grid(d);
 
-    d->grid[d->pc_y][d->pc_x].type = PLAYER;
+    d->grid[d->pc.y][d->pc.x].type = PLAYER;
 
     fclose(ls.f);
     free(ls.dungeon_file);

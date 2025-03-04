@@ -29,13 +29,10 @@ int generate_random_stair(Dungeon *d, char stair, int idx){
     if (stair == UP_STAIRS) {
         d->up_stairs[idx].x = x;
         d->up_stairs[idx].y = y;
-        d->current_up_stair_idx++;
     } else {
         d->down_stairs[idx].x = x;
         d->down_stairs[idx].y = y;
-        d->current_down_stair_idx++;
     }
     
-
     return 1;
 }

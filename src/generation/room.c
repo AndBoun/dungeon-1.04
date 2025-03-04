@@ -78,7 +78,7 @@ void generate_room(Dungeon *d, Room room){
  * @return true if room was successfully generated and placed
  * @return false if room could not be placed after maximum attempts
  */
-bool generate_random_room(Dungeon *d){
+bool generate_random_room(Dungeon *d, int idx){
     Room room;
     int attempts = 0;
 
@@ -106,8 +106,7 @@ bool generate_random_room(Dungeon *d){
 
     } while (!can_insert_room(d, room));
 
-    d->rooms[d->current_room_idx] = room;
+    d->rooms[idx] = room;
     generate_room(d, room);
-    d->current_room_idx++;
     return true;
 }

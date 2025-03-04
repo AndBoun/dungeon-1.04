@@ -6,6 +6,7 @@
 #define DUNGEON_H
 
 #include <stdbool.h>
+#include <character.h>
 
 #define INF 1000000000
 
@@ -16,6 +17,8 @@
 #define DOWN_STAIRS '>'
 #define UP_STAIRS '<'
 #define PLAYER '@'
+
+#define PC_SPEED 10
 
 // Border characters for the Dungeon grid
 #define HORIZONTAL_BORDER '-'
@@ -55,24 +58,29 @@ typedef struct {
 typedef struct {
     int hardness;
     char type;
-} FloorTile;
+} Cell;
 
 typedef struct {
     int x, y;
 } Stair;
 
 typedef struct {
-    FloorTile grid[DUNGEON_HEIGHT][DUNGEON_WIDTH];
+    Cell grid[DUNGEON_HEIGHT][DUNGEON_WIDTH];
+
     Room* rooms;       // Dynamically allocated array of rooms
     int num_rooms;     // Number of rooms in the Dungeon
-    int current_room_idx;  // Bit field initialized to 0 by default
-    int pc_x, pc_y;    // Player character coordinates
-    int num_up_stairs, num_down_stairs;
+    
     Stair* up_stairs;
-    Stair* down_stairs;
-    int current_up_stair_idx;
-    int current_down_stair_idx;
+    int num_up_stairs;
 
+    Stair* down_stairs;
+    int num_down_stairs;
+
+    Player pc;
+
+    Monster* monsters;
+    int num_monsters;
+    
     int non_tunneling_dist_map [DUNGEON_HEIGHT][DUNGEON_WIDTH];
     int tunneling_dist_map [DUNGEON_HEIGHT][DUNGEON_WIDTH];
 } Dungeon;
@@ -85,7 +93,7 @@ void generate_corridor(Dungeon *d, int x1, int y1, int x2, int y2);
 
 int can_insert_room(Dungeon *d, Room room);
 void generate_room(Dungeon *d, Room room);
-bool generate_random_room(Dungeon *d);
+bool generate_random_room(Dungeon *d, int idx);
 
 int generate_random_stair(Dungeon *d, char stair, int idx);
 bool place_stair(Dungeon *d, int x, int y, char stair);
