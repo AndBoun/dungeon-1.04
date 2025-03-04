@@ -12,6 +12,7 @@ typedef struct {
     int speed;
     char symbol;
     int alive;
+    int ID;
 } Monster;
 
 typedef struct {

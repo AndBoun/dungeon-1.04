@@ -15,7 +15,7 @@ int init_player(Player *p, int x, int y) {
     return 0;
 }
 
-int init_monster(Monster *m, int x, int y) {
+int init_monster(Monster *m, int x, int y, int ID) {
     m->intelligent = rand() % 2, m->telepathy = rand() % 2;
     m->tunneling = rand() % 2, m->erratic = rand() % 2;
 
@@ -38,19 +38,29 @@ int init_monster(Monster *m, int x, int y) {
 
 
     m->alive = 1;
+    m->ID = ID;
 
     return 0;
 }
 
-int place_monster_randomly(Dungeon *d, int idx){
+static Point get_valid_coordinates(Dungeon *d){
     int x, y;
     do {
         x = rand() % PLACABLE_WIDTH + 1;
         y = rand() % PLACABLE_HEIGHT + 1;
     } while (d->grid[y][x].type == CORRIDOR || d->grid[y][x].type == ROCK);
 
+    Point p;
+    p.x = x, p.y = y;
+    return p;
+}
+
+int place_monster_randomly(Dungeon *d, int idx){
+    Point p = get_valid_coordinates(d);
+    int x = p.x, y = p.y;
+
     Monster m;
-    init_monster(&m, x, y);
+    init_monster(&m, x, y, idx);
     d->monsters[idx] = m;
     d->grid[y][x].type = d->monsters[idx].symbol;
     
@@ -58,11 +68,8 @@ int place_monster_randomly(Dungeon *d, int idx){
 }
 
 int place_player_randomly(Dungeon *d){
-    int x, y;
-    do {
-        x = rand() % PLACABLE_WIDTH + 1;
-        y = rand() % PLACABLE_HEIGHT + 1;
-    } while (d->grid[y][x].type == CORRIDOR || d->grid[y][x].type == ROCK);
+    Point p = get_valid_coordinates(d);
+    int x = p.x, y = p.y;
 
     init_player(&d->pc, x, y);
     d->grid[y][x].type = PLAYER;

@@ -68,6 +68,10 @@ typedef struct {
 } Stair;
 
 typedef struct {
+    int x, y;       
+} Point;
+
+typedef struct {
     Cell grid[DUNGEON_HEIGHT][DUNGEON_WIDTH];
 
     Room* rooms;       // Dynamically allocated array of rooms

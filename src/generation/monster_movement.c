@@ -12,6 +12,8 @@ typedef struct {
     int x, y;
 } Point;
 
+// Check if the monster has line of sight to the target
+// Monster has line of sight if within a 20 cell radius
 static int has_line_of_sight(Dungeon *d, int x, int y){
     int pc_x = d->pc.x, pc_y = d->pc.y;
 
@@ -132,18 +134,23 @@ static Point get_next_intelligent_move(Dungeon *d, int x, int y, int pc_x, int p
 // Get the next move for an unintelligent monster
 static Point get_next_unintelligent_move(Dungeon *d, int x, int y, int tunneling){
     Point p;
-    p.x = x + (x < d->pc.x ? 1 : -1);
-    p.y = y + (y < d->pc.y ? 1 : -1);
+    p.x = x, p.y = y;
 
-    if (tunneling){
-        if (!is_valid_move_tunnel(d, p.x, y)){
-            p.y = y;
-        }
-    } else {
-        if (!is_valid_move_non_tunnel(d, x, p.y)){
-            p.x = x;
-        }
+    // Calculate the direction towards the PC
+    int dx = (x < d->pc.x) ? 1 : (x > d->pc.x) ? -1 : 0;
+    int dy = (y < d->pc.y) ? 1 : (y > d->pc.y) ? -1 : 0;
+
+    // Choose movement validation function based on monster type
+    int (*is_valid_move)(Dungeon*, int, int) = tunneling ? 
+            is_valid_move_tunnel : is_valid_move_non_tunnel;
+
+    // Try to move one step horizontaly or vertically of the PC
+    if (dx != 0 && is_valid_move(d, x + dx, y)){
+        p.x = x + dx;
+    } else if (dy != 0 && is_valid_move(d, x, y + dy)){
+        p.y = y + dy;
     }
+
     return p;
 }
 
@@ -157,6 +164,8 @@ static int move_non_tunnel(Dungeon *d, int x, int y, int new_x, int new_y){
                 d->pc.alive = 0;
             } else {
                 int idx = find_monster_idx(d, new_x, new_y, d->grid[new_y][new_x].type);
+
+                // TODO: Call remove monster function
                 d->monsters[idx].alive = 0;
             }
         }
