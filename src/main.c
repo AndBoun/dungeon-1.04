@@ -51,10 +51,10 @@ int main(int argc, char *argv[]) {
         printf("Dungeon saved.\n");
     }
 
-    create_non_tunneling_map(&d);
+    create_non_tunneling_map(&d, d.pc.x, d.pc.y);
     print_dist_map(d.non_tunneling_dist_map);
     
-    create_tunneling_map(&d);
+    create_tunneling_map(&d, d.pc.x, d.pc.y);
     print_dist_map(d.tunneling_dist_map);
 
 

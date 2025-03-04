@@ -10,7 +10,7 @@
 
 
 
-int create_non_tunneling_map(Dungeon *d);
-int create_tunneling_map(Dungeon *d);
+int create_non_tunneling_map(Dungeon *d, int pc_x, int pc_y);
+int create_tunneling_map(Dungeon *d, int pc_x, int pc_y);
 
 #endif

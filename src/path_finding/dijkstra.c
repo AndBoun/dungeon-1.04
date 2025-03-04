@@ -48,18 +48,18 @@ static void initialize_distance_map(int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH])
             dist_map[i][j] = INF;
 }
 
-int create_non_tunneling_map(Dungeon *d) {
+int create_non_tunneling_map(Dungeon *d, int pc_x, int pc_y) {
     // Initialize the distance map using the new function
     initialize_distance_map(d->non_tunneling_dist_map);
-    find_all_paths(d, d->non_tunneling_dist_map, d->pc.x, d->pc.y, 0);
+    find_all_paths(d, d->non_tunneling_dist_map, pc_x, pc_y, 0);
     return 0;
 }
 
 // Adds support for printing unreachable areas for bonus maps
-int create_tunneling_map(Dungeon *d) {
+int create_tunneling_map(Dungeon *d, int pc_x, int pc_y) {
     // Initialize the distance map using the new function
     initialize_distance_map(d->tunneling_dist_map);
-    find_all_paths(d, d->tunneling_dist_map, d->pc.x, d->pc.y, 1);
+    find_all_paths(d, d->tunneling_dist_map, pc_x, pc_y, 1);
     return 0;
 }
 

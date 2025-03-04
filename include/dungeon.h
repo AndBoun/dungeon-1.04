@@ -116,4 +116,6 @@ void destroy_dungeon(Dungeon *d);
 
 void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]);
 
+int move_monster(Monster *m, Dungeon *d);
+
 #endif
