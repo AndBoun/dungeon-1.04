@@ -12,7 +12,7 @@ typedef struct {
     int x, y;
 } Point;
 
-int has_line_of_sight(Dungeon *d, int x, int y){
+static int has_line_of_sight(Dungeon *d, int x, int y){
     int pc_x = d->pc.x, pc_y = d->pc.y;
 
     // Check if PC is within sight radius
@@ -60,7 +60,7 @@ int has_line_of_sight(Dungeon *d, int x, int y){
     return 1; // Line of sight is clear
 }
 
-int find_monster_idx(Dungeon *d, int x, int y, char symbol){
+static int find_monster_idx(Dungeon *d, int x, int y, char symbol){
     for (int i = 0; i < d->num_monsters; i++){
         if (d->monsters[i].x == x && d->monsters[i].y == y && d->monsters[i].symbol == symbol){
             return i;
@@ -69,14 +69,17 @@ int find_monster_idx(Dungeon *d, int x, int y, char symbol){
     return -1;
 }
 
+// Check if the move is valid for non-tunneling monsters
 static int is_valid_move_non_tunnel(Dungeon *d, int x, int y){
     return d->grid[y][x].hardness == 0;
 }
 
+// Check if the move is valid for tunneling monsters
 static int is_valid_move_tunnel(Dungeon *d, int x, int y){
     return d->grid[y][x].hardness != MAX_HARDNESS;
 }
 
+// Get the next move for an intelligent monster
 static Point get_next_intelligent_move(Dungeon *d, int x, int y, int pc_x, int pc_y, int tunneling){
 
     // Recalculate the distance maps if using PC's remembered position
@@ -126,10 +129,25 @@ static Point get_next_intelligent_move(Dungeon *d, int x, int y, int pc_x, int p
     return p;
 }
 
-static int move_tunnel(Dungeon *d, int x, int y, int new_x, int new_y){
-    return 0;
+// Get the next move for an unintelligent monster
+static Point get_next_unintelligent_move(Dungeon *d, int x, int y, int tunneling){
+    Point p;
+    p.x = x + (x < d->pc.x ? 1 : -1);
+    p.y = y + (y < d->pc.y ? 1 : -1);
+
+    if (tunneling){
+        if (!is_valid_move_tunnel(d, p.x, y)){
+            p.y = y;
+        }
+    } else {
+        if (!is_valid_move_non_tunnel(d, x, p.y)){
+            p.x = x;
+        }
+    }
+    return p;
 }
 
+// Move a non-tunneling monster in the dungeon
 static int move_non_tunnel(Dungeon *d, int x, int y, int new_x, int new_y){
     if (is_valid_move_non_tunnel(d, new_x, new_y)){
         d->grid[y][x].type = FLOOR;
@@ -148,6 +166,25 @@ static int move_non_tunnel(Dungeon *d, int x, int y, int new_x, int new_y){
     return 0;
 }
 
+static int move_tunnel(Dungeon *d, int x, int y, int new_x, int new_y){
+    if (!is_valid_move_tunnel(d, new_x, new_y)) return 0;
+
+    // Burrow through the wall
+    if (d->grid[new_y][new_x].hardness <= 85) {
+        d->grid[new_y][new_x].hardness = 0;
+        d->grid[new_y][new_x].type = FLOOR;
+    } else {
+        d->grid[new_y][new_x].hardness -= 85;
+        return 0;
+    }
+
+    move_non_tunnel(d, x, y, new_x, new_y);
+
+    return 0;
+}
+
+
+
 
 int move_monster(Monster *m, Dungeon *d){
     int new_x, new_y;
@@ -163,18 +200,11 @@ int move_monster(Monster *m, Dungeon *d){
         // Non-intelligent monsters forget PC position when out of sight
         m->pc_x = -1;
         m->pc_y = -1;
-        return 0; // No movement
     }
 
-    
-    if (intelligent){ // intelligent movement towards PC
-        Point p = get_next_intelligent_move(d, m->x, m->y, m->pc_x, m->pc_y, tunneling);
-        new_x = p.x;
-        new_y = p.y;
-    } else {
-        return(0);
-    }
-    
+    // if player position is unknown, do not move
+    if (m->pc_x == -1 || m->pc_y == -1) return 0;
+
     if (erratic && rand() % 2 == 1){ // erratic random movement, 50% chance
         do {
             new_x = m->x + (rand() % 3 - 1);
@@ -182,7 +212,19 @@ int move_monster(Monster *m, Dungeon *d){
         } while (!(tunneling 
             ? is_valid_move_tunnel(d, new_x, new_y) 
             : is_valid_move_non_tunnel(d, new_x, new_y)));  
+    } else {
+        if (intelligent){ // intelligent movement towards PC
+            Point p = get_next_intelligent_move(d, m->x, m->y, m->pc_x, m->pc_y, tunneling);
+            new_x = p.x;
+            new_y = p.y;
+        } else {
+            Point p = get_next_unintelligent_move(d, m->x, m->y, tunneling);
+            if (p.x == m->x && p.y == m->y) return 0; // no movement
+            new_x = p.x;
+            new_y = p.y;
+        }
     }
+    
 
     if (tunneling){
         move_tunnel(d, m->x, m->y, new_x, new_y);
