@@ -10,6 +10,9 @@
 
 #define INF 1000000000
 
+#define CHAR_TYPE_PLAYER 0
+#define CHAR_TYPE_MONSTER 1
+
 // Character definitions for the Dungeon grid
 #define ROCK ' '
 #define FLOOR '.'
@@ -102,8 +105,12 @@ void print_room_info(const Dungeon *d);
 void print_hardness_info(const Dungeon *d);
 void print_grid(const Dungeon *d);
 
-int place_random_player(Dungeon *d);
+int place_player_randomly(Dungeon *d);
+int place_monster_randomly(Dungeon *d, int idx);
+
 bool generate_random_dungeon(Dungeon *d);
+
+int initialize_monsters(Dungeon *d);
 
 void destroy_dungeon(Dungeon *d);
 

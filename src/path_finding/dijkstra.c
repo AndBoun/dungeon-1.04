@@ -51,7 +51,7 @@ static void initialize_distance_map(int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH])
 int create_non_tunneling_map(Dungeon *d) {
     // Initialize the distance map using the new function
     initialize_distance_map(d->non_tunneling_dist_map);
-    find_all_paths(d, d->non_tunneling_dist_map, d->pc_x, d->pc_y, 0);
+    find_all_paths(d, d->non_tunneling_dist_map, d->pc.x, d->pc.y, 0);
     return 0;
 }
 
@@ -59,7 +59,7 @@ int create_non_tunneling_map(Dungeon *d) {
 int create_tunneling_map(Dungeon *d) {
     // Initialize the distance map using the new function
     initialize_distance_map(d->tunneling_dist_map);
-    find_all_paths(d, d->tunneling_dist_map, d->pc_x, d->pc_y, 1);
+    find_all_paths(d, d->tunneling_dist_map, d->pc.x, d->pc.y, 1);
     return 0;
 }
 

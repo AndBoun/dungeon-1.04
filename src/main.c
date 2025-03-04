@@ -57,6 +57,10 @@ int main(int argc, char *argv[]) {
     create_tunneling_map(&d);
     print_dist_map(d.tunneling_dist_map);
 
+
+    initialize_monsters(&d);
+    print_grid(&d);
+
     destroy_dungeon(&d);
 
     return 0;
