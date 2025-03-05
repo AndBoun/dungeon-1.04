@@ -110,17 +110,17 @@ void print_grid(const Dungeon *d);
 
 int place_player_randomly(Dungeon *d);
 int place_monster_randomly(Dungeon *d, int idx);
+int initialize_monsters(Dungeon *d);
+int place_monster(Dungeon *d, int x, int y, int idx);
+int move_monster(Monster *m, Dungeon *d);
+int get_monster_ID(Dungeon *d, int x, int y);
 
 bool generate_random_dungeon(Dungeon *d);
-
-int initialize_monsters(Dungeon *d);
 
 void destroy_dungeon(Dungeon *d);
 
 void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]);
 
-int move_monster(Monster *m, Dungeon *d);
-int get_monster_ID(Dungeon *d, int x, int y);
 
 
 #endif

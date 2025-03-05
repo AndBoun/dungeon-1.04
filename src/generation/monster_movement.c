@@ -11,12 +11,12 @@
 
 
 // Check if the monster has line of sight to the target
-// Monster has line of sight if within a 20 cell radius
+// Monster has line of sight if within a 25 cell radius, with no walls in between
 static int has_line_of_sight(Dungeon *d, int x, int y){
     int pc_x = d->pc.x, pc_y = d->pc.y;
 
     // Check if PC is within sight radius
-    int sight_radius = 20;
+    int sight_radius = 25;
     int dx = x - pc_x;
     int dy = y - pc_y;
     if (dx*dx + dy*dy > sight_radius*sight_radius) {
@@ -62,23 +62,52 @@ static int has_line_of_sight(Dungeon *d, int x, int y){
 
 // Check if the move is valid for non-tunneling monsters
 static int is_valid_move_non_tunnel(Dungeon *d, int x, int y){
+    if (x < 0 || x >= DUNGEON_WIDTH || y < 0 || y >= DUNGEON_HEIGHT) return 0;
     return d->grid[y][x].hardness == 0;
 }
 
 // Check if the move is valid for tunneling monsters
 static int is_valid_move_tunnel(Dungeon *d, int x, int y){
+    if (x < 0 || x >= DUNGEON_WIDTH || y < 0 || y >= DUNGEON_HEIGHT) return 0;
     return d->grid[y][x].hardness != MAX_HARDNESS;
 }
 
 // Randomly move a monster, used for erratic and unintelligent monsters
 static Point random_move(Dungeon *d, int x, int y, int tunneling){
     Point p;
-    do {
-        p.x = x + (rand() % 3 - 1);
-        p.y = y + (rand() % 3 - 1);
-    } while (!(tunneling 
-        ? is_valid_move_tunnel(d, p.x, p.y) 
-        : is_valid_move_non_tunnel(d, p.x, p.y))); 
+    Point valid_moves[8]; // Store valid adjacent coordinates
+    int valid_count = 0;
+    int (*is_valid_func)(Dungeon*, int, int) = 
+        tunneling ? is_valid_move_tunnel : is_valid_move_non_tunnel;
+    
+    // Check all 8 adjacent cells
+    for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = -1; dx <= 1; dx++) {
+            // Skip the cell itself (0,0)
+            if (dx == 0 && dy == 0) continue;
+            
+            int new_x = x + dx;
+            int new_y = y + dy;
+            
+            // If valid, add to our list of valid moves
+            if (is_valid_func(d, new_x, new_y)) {
+                valid_moves[valid_count].x = new_x;
+                valid_moves[valid_count].y = new_y;
+                valid_count++;
+            }
+        }
+    }
+    
+    // If we have valid moves, randomly select one
+    if (valid_count > 0) {
+        int choice = rand() % valid_count;
+        p = valid_moves[choice];
+    } else {
+        // No valid moves, stay in place
+        p.x = x;
+        p.y = y;
+    }
+    
     return p;
 }
 
@@ -165,7 +194,10 @@ static Point get_next_unintelligent_move(Dungeon *d, Monster *m, int tunneling){
 static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
     if (is_valid_move_non_tunnel(d, new_x, new_y)){
         
-        if (d->grid[new_y][new_x].type != FLOOR || d->grid[new_y][new_x].type != CORRIDOR){
+        if (d->grid[new_y][new_x].type != FLOOR &&
+            d->grid[new_y][new_x].type != CORRIDOR &&
+            d->grid[new_y][new_x].type != UP_STAIRS &&
+            d->grid[new_y][new_x].type != DOWN_STAIRS){
             if (d->grid[new_y][new_x].type == PLAYER){
                 d->pc.alive = 0;
                 d->grid[new_y][new_x].type = d->pc.curr_cell;
@@ -173,19 +205,21 @@ static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
                 int ID = get_monster_ID(d, new_x, new_y);
                 d->monsters[m->ID].alive = 0;
                 d->grid[new_y][new_x].type = d->monsters[ID].curr_cell;
+                d->monsters[ID].alive = 0;
                 d->num_monsters_alive--;
             }
         }
 
         // Update the current cell type
-        d->grid[m->y][m->y].type = m->curr_cell; // return the cell to its original type
-        print_grid(d);
+        d->grid[m->y][m->x].type = m->curr_cell; // return the cell to its original type
+        // print_grid(d);
+
         m->curr_cell = d->grid[new_y][new_x].type; // update the current cell type
-        print_grid(d);
+        // print_grid(d);
 
         // Move the monster on the grid array
         d->grid[new_y][new_x].type = m->symbol;
-        print_grid(d);
+        // print_grid(d);
 
         m->x = new_x;
         m->y = new_y;
@@ -214,8 +248,6 @@ static int move_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
 
     return 0;
 }
-
-
 
 
 int move_monster(Monster *m, Dungeon *d){
@@ -248,13 +280,14 @@ int move_monster(Monster *m, Dungeon *d){
             new_y = p.y;
         } else {
             Point p = get_next_unintelligent_move(d, m, tunneling);
-            if (p.x == m->x && p.y == m->y) return 0; // no movement
             new_x = p.x;
             new_y = p.y;
         }
     }
     
-
+    if (new_x == m->x && new_y == m->y) return 0; // No movement
+    printf("Monster %d moved from (%d, %d) to (%d, %d)\n", m->ID, m->x, m->y, new_x, new_y);
+    
     if (tunneling){
         move_tunnel(d, m, new_x, new_y);
     } else {
