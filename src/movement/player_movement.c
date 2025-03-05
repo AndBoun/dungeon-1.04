@@ -18,10 +18,7 @@ int move_player(Dungeon *d, int x, int y){
         d->grid[y][x].type != UP_STAIRS &&
         d->grid[y][x].type != DOWN_STAIRS
     ){
-        int ID = get_monster_ID(d, x, y);
-        d->grid[y][x].type = d->monsters[ID].curr_cell;
-        d->monsters[ID].alive = 0;
-        d->num_monsters_alive--;
+        kill_monster(d, x, y);
     }
 
 

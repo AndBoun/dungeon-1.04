@@ -9,6 +9,15 @@
 #include <dijkstra.h>
 
 
+int kill_monster(Dungeon *d, int x, int y){
+    int ID = get_monster_ID(d, x, y);
+    d->grid[y][x].type = d->monsters[ID].curr_cell;
+    d->monsters[ID].alive = 0;
+    d->monsters[ID].x = -1;
+    d->monsters[ID].y = -1;
+    d->num_monsters_alive--;
+    return 0;
+}
 
 // Check if the monster has line of sight to the target
 // Monster has line of sight if within a 25 cell radius, with no walls in between
@@ -221,12 +230,7 @@ static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
                 d->grid[new_y][new_x].type = d->pc.curr_cell;
             } else {
                 printf("Monster %d killed a monster\n", m->ID);
-                int ID = get_monster_ID(d, new_x, new_y);
-                d->grid[new_y][new_x].type = d->monsters[ID].curr_cell;
-                d->monsters[ID].alive = 0;
-                // d->monsters[ID].x = -1;
-                // d->monsters[ID].y = -1;
-                d->num_monsters_alive--;
+                kill_monster(d, new_x, new_y);
             }
         }
 

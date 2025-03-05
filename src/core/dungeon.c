@@ -102,5 +102,6 @@ void destroy_dungeon(Dungeon *d){
     free(d->rooms);
     free(d->up_stairs);
     free(d->down_stairs);
+    free(d->monsters);
     return;
 }

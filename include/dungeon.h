@@ -117,6 +117,7 @@ int initialize_monsters(Dungeon *d);
 int place_monster(Dungeon *d, int x, int y, int idx);
 int move_monster(Monster *m, Dungeon *d);
 int get_monster_ID(Dungeon *d, int x, int y);
+int kill_monster(Dungeon *d, int x, int y);
 
 bool generate_random_dungeon(Dungeon *d);
 
