@@ -75,13 +75,13 @@ int place_monster_randomly(Dungeon *d, int idx){
     return 1;
 }
 
-int place_player_randomly(Dungeon *d){
-    Point p = get_random_coordinates(d);
-    int x = p.x, y = p.y;
-
-    init_player(&d->pc, x, y, d->grid[y][x].type);
-    d->grid[y][x].type = PLAYER;
-
+// Initialize monsters in the dungeon
+int initialize_monsters(Dungeon *d){
+    d->monsters = malloc(d->num_monsters * sizeof(Monster));
+    d->num_monsters_alive = d->num_monsters;
+    for (int i = 0; i < d->num_monsters; i++){
+        place_monster_randomly(d, i);
+    }
     return 1;
 }
 
@@ -95,3 +95,22 @@ int get_monster_ID(Dungeon *d, int x, int y){
     }
     return ID;
 }
+
+int place_player(Dungeon *d, int x, int y){
+    init_player(&d->pc, x, y, d->grid[y][x].type);
+    d->grid[y][x].type = PLAYER;
+
+    return 1;
+}
+
+int place_player_randomly(Dungeon *d){
+    Point p = get_random_coordinates(d);
+    int x = p.x, y = p.y;
+
+    init_player(&d->pc, x, y, d->grid[y][x].type);
+    d->grid[y][x].type = PLAYER;
+
+    return 1;
+}
+
+

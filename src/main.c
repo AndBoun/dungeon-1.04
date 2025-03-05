@@ -67,28 +67,38 @@ int main(int argc, char *argv[]) {
 
     d.monsters = malloc(d.num_monsters * sizeof(Monster));
     d.num_monsters_alive = d.num_monsters;
-    int y = 38, x = 13;
-    place_monster(&d, y, x, 0);
-    d.monsters[0].intelligent = 0;
-    d.monsters[0].tunneling = 0;
-    d.monsters[0].telepathy = 0;
+    int x = 38, y = 13;
+    place_monster(&d, x, y, 0);
+    d.monsters[0].intelligent = 1;
+    d.monsters[0].tunneling = 1;
+    d.monsters[0].telepathy = 1;
     d.monsters[0].erratic = 0;
     d.monsters[0].symbol = '0';
     d.grid[y][x].type = d.monsters[0].symbol;
+
     
-    print_grid(&d);
+    // print_grid(&d);
+    
 
+    for (int i = 0; i < 30; i++){
+        if (d.pc.alive == 0 || d.num_monsters_alive == 0) {
+            if (d.pc.alive == 0) printf("Player is dead.\n");
+            if (d.num_monsters_alive == 0) printf("All monsters are dead.\n");
+            break;
+        }
+        
+        usleep(400000);
 
-    // for (int i = 0; i < 20; i++){
-    //     if (d.pc.alive == 0 || d.num_monsters_alive == 0) {
-    //         if (d.pc.alive == 0) printf("Player is dead.\n");
-    //         if (d.num_monsters_alive == 0) printf("All monsters are dead.\n");
-    //         break;
-    //     }
+        move_monster(&d.monsters[0], &d);
+        print_grid(&d);
 
-    //     move_monster(&d.monsters[0], &d);
-    //     print_grid(&d);
-    // }
+        if (i == 8){
+            move_player(&d, 60, 12);
+            create_non_tunneling_map(&d, d.pc.x, d.pc.y);
+            create_tunneling_map(&d, d.pc.x, d.pc.y);
+            print_dist_map(d.tunneling_dist_map);
+        }
+    }
 
     destroy_dungeon(&d);
 

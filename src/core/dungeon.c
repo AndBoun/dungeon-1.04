@@ -98,16 +98,6 @@ bool generate_random_dungeon(Dungeon *d){
     return true;
 }
 
-// Initialize monsters in the dungeon
-int initialize_monsters(Dungeon *d){
-    d->monsters = malloc(d->num_monsters * sizeof(Monster));
-    d->num_monsters_alive = d->num_monsters;
-    for (int i = 0; i < d->num_monsters; i++){
-        place_monster_randomly(d, i);
-    }
-    return 1;
-}
-
 void destroy_dungeon(Dungeon *d){
     free(d->rooms);
     free(d->up_stairs);

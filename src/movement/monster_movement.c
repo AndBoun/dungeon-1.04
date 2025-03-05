@@ -114,18 +114,21 @@ static Point random_move(Dungeon *d, int x, int y, int tunneling){
 // Get the next move for an intelligent monster
 static Point get_next_intelligent_move(Dungeon *d, Monster *m, int tunneling){
 
+    if (m->pc_x == m->x && m->pc_y == m->y) return (Point){m->x, m->y};
+
     // Recalculate the distance maps if using PC's remembered position
     if (m->pc_x != d->pc.x || m->pc_y != d->pc.y){
         create_non_tunneling_map(d, m->pc_x, m->pc_y);
         create_tunneling_map(d, m->pc_x, m->pc_y);
     }
 
+    
     int dx[] = {-1, -1, -1,  0, 0, 1, 1, 1};
     int dy[] = {-1,  0,  1, -1, 1,-1, 0, 1};
 
     Point p;
-    p.x = INF;
-    p.y = INF;
+    p.x = m->x;
+    p.y = m->y;
     int min_dist = INF;
     for (int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
@@ -139,11 +142,24 @@ static Point get_next_intelligent_move(Dungeon *d, Monster *m, int tunneling){
 
             if (tunneling){
                 //Account for -1 being an invalid weight
-                if (d->tunneling_dist_map[new_y][new_x] < min_dist &&
-                    d->tunneling_dist_map[new_y][new_x] != -1){
-                    min_dist = d->tunneling_dist_map[new_y][new_x];
-                    p.x = new_x;
-                    p.y = new_y;
+                if (d->tunneling_dist_map[new_y][new_x] <= min_dist &&
+                    d->tunneling_dist_map[new_y][new_x] != -1
+                ){
+
+                    // Prevent tunneling through walls if not the shortest path
+                    // Select the first minimum distance
+                    if (d->grid[new_y][new_x].hardness == 0 &&
+                        d->grid[p.y][p.x].hardness != 0
+                    ){
+                        min_dist = d->tunneling_dist_map[new_y][new_x];
+                        p.x = new_x;
+                        p.y = new_y;
+                    } else if (d->tunneling_dist_map[new_y][new_x] < min_dist){
+                        min_dist = d->tunneling_dist_map[new_y][new_x];
+                        p.x = new_x;
+                        p.y = new_y;
+                    }
+                    
                 }
             } else {
                 if (d->non_tunneling_dist_map[new_y][new_x] < min_dist){
@@ -194,10 +210,12 @@ static Point get_next_unintelligent_move(Dungeon *d, Monster *m, int tunneling){
 static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
     if (is_valid_move_non_tunnel(d, new_x, new_y)){
         
+        // Check if the new cell is occupied, and kill the occupant
         if (d->grid[new_y][new_x].type != FLOOR &&
             d->grid[new_y][new_x].type != CORRIDOR &&
             d->grid[new_y][new_x].type != UP_STAIRS &&
-            d->grid[new_y][new_x].type != DOWN_STAIRS){
+            d->grid[new_y][new_x].type != DOWN_STAIRS
+        ){
             if (d->grid[new_y][new_x].type == PLAYER){
                 d->pc.alive = 0;
                 d->grid[new_y][new_x].type = d->pc.curr_cell;
@@ -239,7 +257,7 @@ static int move_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
         // Recalculate the distance maps when dungeon changes
         create_non_tunneling_map(d, d->pc.x, d->pc.y);
         create_tunneling_map(d, d->pc.x, d->pc.y);
-    } else {
+    } else if (d->grid[new_y][new_x].hardness > 85){
         d->grid[new_y][new_x].hardness -= 85;
         return 0;
     }
@@ -279,6 +297,7 @@ int move_monster(Monster *m, Dungeon *d){
             new_x = p.x;
             new_y = p.y;
         } else {
+            printf("Monster %d is unintelligent\n", m->ID);
             Point p = get_next_unintelligent_move(d, m, tunneling);
             new_x = p.x;
             new_y = p.y;

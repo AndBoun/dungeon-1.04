@@ -109,6 +109,9 @@ void print_hardness_info(const Dungeon *d);
 void print_grid(const Dungeon *d);
 
 int place_player_randomly(Dungeon *d);
+int place_player(Dungeon *d, int x, int y);
+int move_player(Dungeon *d, int x, int y);
+
 int place_monster_randomly(Dungeon *d, int idx);
 int initialize_monsters(Dungeon *d);
 int place_monster(Dungeon *d, int x, int y, int idx);

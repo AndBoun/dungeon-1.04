@@ -5,13 +5,14 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 # Create directory structure for object files
-DIRS = $(OBJ_DIR) $(OBJ_DIR)/core $(OBJ_DIR)/generation $(OBJ_DIR)/io $(OBJ_DIR)/path_finding
+DIRS = $(OBJ_DIR) $(OBJ_DIR)/core $(OBJ_DIR)/generation $(OBJ_DIR)/io $(OBJ_DIR)/path_finding $(OBJ_DIR)/movement
 
 # Source files
 CORE_SRC = $(wildcard $(SRC_DIR)/core/*.c)
 GEN_SRC = $(wildcard $(SRC_DIR)/generation/*.c)
 IO_SRC = $(wildcard $(SRC_DIR)/io/*.c)
 PATH_FINDING_SRC = $(wildcard $(SRC_DIR)/path_finding/*.c)
+MOVEMENT_SRC = $(wildcard $(SRC_DIR)/movement/*.c)
 
 MAIN_SRC = $(SRC_DIR)/main.c
 
@@ -20,11 +21,12 @@ CORE_OBJ = $(patsubst $(SRC_DIR)/core/%.c, $(OBJ_DIR)/core/%.o, $(CORE_SRC))
 GEN_OBJ = $(patsubst $(SRC_DIR)/generation/%.c, $(OBJ_DIR)/generation/%.o, $(GEN_SRC))
 IO_OBJ = $(patsubst $(SRC_DIR)/io/%.c, $(OBJ_DIR)/io/%.o, $(IO_SRC))
 PATH_FINDING_OBJ = $(patsubst $(SRC_DIR)/path_finding/%.c, $(OBJ_DIR)/path_finding/%.o, $(PATH_FINDING_SRC))
+MOVEMENT_OBJ = $(patsubst $(SRC_DIR)/movement/%.c, $(OBJ_DIR)/movement/%.o, $(MOVEMENT_SRC))
 
 MAIN_OBJ = $(OBJ_DIR)/main.o
 
 # All objects
-ALL_OBJ = $(CORE_OBJ) $(GEN_OBJ) $(IO_OBJ) $(PATH_FINDING_OBJ) $(MAIN_OBJ)
+ALL_OBJ = $(CORE_OBJ) $(GEN_OBJ) $(IO_OBJ) $(PATH_FINDING_OBJ) $(MAIN_OBJ) $(MOVEMENT_OBJ)
 
 # Target executable
 TARGET = dungeon
@@ -55,6 +57,10 @@ $(OBJ_DIR)/io/%.o: $(SRC_DIR)/io/%.c $(INCLUDE_DIR)/dungeon.h $(INCLUDE_DIR)/loa
 
 # Compile path_finding files
 $(OBJ_DIR)/path_finding/%.o: $(SRC_DIR)/path_finding/%.c $(INCLUDE_DIR)/dijkstra.h
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+
+# Compile movement files
+$(OBJ_DIR)/movement/%.o: $(SRC_DIR)/movement/%.c $(INCLUDE_DIR)/dungeon.h
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
 clean:
