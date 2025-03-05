@@ -12,6 +12,19 @@ int move_player(Dungeon *d, int x, int y){
     if (d->grid[y][x].type == ROCK) return 0;
     if (d->grid[y][x].hardness > 0) return 0;
 
+    // Check if the new cell is occupied, and kill the occupant
+    if (d->grid[y][x].type != FLOOR &&
+        d->grid[y][x].type != CORRIDOR &&
+        d->grid[y][x].type != UP_STAIRS &&
+        d->grid[y][x].type != DOWN_STAIRS
+    ){
+        int ID = get_monster_ID(d, x, y);
+        d->grid[y][x].type = d->monsters[ID].curr_cell;
+        d->monsters[ID].alive = 0;
+        d->num_monsters_alive--;
+    }
+
+
     d->grid[d->pc.y][d->pc.x].type = d->pc.curr_cell; // return the cell to its original type
     d->pc.curr_cell = d->grid[y][x].type; // update the current cell type
     d->grid[y][x].type = PLAYER; // Move the player on the grid array

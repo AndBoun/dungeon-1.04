@@ -220,10 +220,12 @@ static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y){
                 d->pc.alive = 0;
                 d->grid[new_y][new_x].type = d->pc.curr_cell;
             } else {
+                printf("Monster %d killed a monster\n", m->ID);
                 int ID = get_monster_ID(d, new_x, new_y);
-                d->monsters[m->ID].alive = 0;
                 d->grid[new_y][new_x].type = d->monsters[ID].curr_cell;
                 d->monsters[ID].alive = 0;
+                // d->monsters[ID].x = -1;
+                // d->monsters[ID].y = -1;
                 d->num_monsters_alive--;
             }
         }
@@ -297,7 +299,6 @@ int move_monster(Monster *m, Dungeon *d){
             new_x = p.x;
             new_y = p.y;
         } else {
-            printf("Monster %d is unintelligent\n", m->ID);
             Point p = get_next_unintelligent_move(d, m, tunneling);
             new_x = p.x;
             new_y = p.y;
@@ -305,7 +306,6 @@ int move_monster(Monster *m, Dungeon *d){
     }
     
     if (new_x == m->x && new_y == m->y) return 0; // No movement
-    printf("Monster %d moved from (%d, %d) to (%d, %d)\n", m->ID, m->x, m->y, new_x, new_y);
     
     if (tunneling){
         move_tunnel(d, m, new_x, new_y);
