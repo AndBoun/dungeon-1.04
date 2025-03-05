@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <dungeon.h>
 #include <load_save.h>
+#include <character.h>
 
 int init_load_save(LoadSave *ls, const char *mode) {
     ls->home = getenv("HOME");
@@ -81,7 +82,8 @@ static int load_pc(LoadSave *ls, Dungeon *d) {
         fclose(ls->f);
         return 1;
     }
-    init_player(&d->pc, pc[0], pc[1]);
+    // initialize player, set curr_cell to FLOOR temporarily, will be set correctly in load()
+    init_player(&d->pc, pc[0], pc[1], FLOOR);
 
 
     return 0;
@@ -282,6 +284,8 @@ int load(Dungeon *d){
     fill_in_corridors(d);
     // print_grid(d);
 
+    // PC has already be initialized, fix the cell type
+    d->pc.curr_cell = d->grid[d->pc.y][d->pc.x].type;
     d->grid[d->pc.y][d->pc.x].type = PLAYER;
 
     fclose(ls.f);

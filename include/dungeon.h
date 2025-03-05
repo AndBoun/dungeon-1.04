@@ -10,9 +10,6 @@
 
 #define INF 1000000000
 
-#define CHAR_TYPE_PLAYER 0
-#define CHAR_TYPE_MONSTER 1
-
 // Character definitions for the Dungeon grid
 #define ROCK ' '
 #define FLOOR '.'
@@ -22,6 +19,7 @@
 #define PLAYER '@'
 
 #define PC_SPEED 10
+#define DEFAULT_NUM_MONSTERS 10
 
 // Border characters for the Dungeon grid
 #define HORIZONTAL_BORDER '-'
@@ -87,6 +85,7 @@ typedef struct {
 
     Monster* monsters;
     int num_monsters;
+    int num_monsters_alive;
     
     int non_tunneling_dist_map [DUNGEON_HEIGHT][DUNGEON_WIDTH];
     int tunneling_dist_map [DUNGEON_HEIGHT][DUNGEON_WIDTH];
@@ -121,5 +120,7 @@ void destroy_dungeon(Dungeon *d);
 void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]);
 
 int move_monster(Monster *m, Dungeon *d);
+int get_monster_ID(Dungeon *d, int x, int y);
+
 
 #endif

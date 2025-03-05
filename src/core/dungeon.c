@@ -18,9 +18,10 @@ void init_dungeon(Dungeon *d) {
     d->up_stairs = NULL;
     d->down_stairs = NULL;
 
-    // initialize PC later
+    // initialize later
     d->monsters = NULL;
-    d->num_monsters = 10; //default number of monsters
+    d->num_monsters = DEFAULT_NUM_MONSTERS; //default number of monsters
+    d->num_monsters_alive = DEFAULT_NUM_MONSTERS;
 }
 
 // Generate a random dungeon and create a player
@@ -97,37 +98,15 @@ bool generate_random_dungeon(Dungeon *d){
     return true;
 }
 
+// Initialize monsters in the dungeon
 int initialize_monsters(Dungeon *d){
     d->monsters = malloc(d->num_monsters * sizeof(Monster));
+    d->num_monsters_alive = d->num_monsters;
     for (int i = 0; i < d->num_monsters; i++){
         place_monster_randomly(d, i);
     }
     return 1;
 }
-
-// randomly places the player in the dungeon
-// char_type = 0 for player, 1 for monster
-// int place_random_character(Dungeon *d, int char_type, int idx){
-//     int x, y;
-//     do {
-//         x = rand() % PLACABLE_WIDTH + 1;
-//         y = rand() % PLACABLE_HEIGHT + 1;
-//     } while (d->grid[y][x].type == CORRIDOR || d->grid[y][x].type == ROCK);
-
-//     if (char_type == CHAR_TYPE_PLAYER){
-//         init_player(&d->pc, x, y);
-//         d->grid[y][x].type = PLAYER;
-//     } else {
-//         Monster m;
-//         init_monster(&m, x, y);
-//         d->grid[y][x].type = d->monsters[d->num_monsters].symbol;
-//         d->monsters[idx] = m;
-//     }
-
-//     return 1;
-// }
-
-
 
 void destroy_dungeon(Dungeon *d){
     free(d->rooms);
