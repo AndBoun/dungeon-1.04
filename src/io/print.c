@@ -16,7 +16,7 @@ void print_hardness_info(const Dungeon *d){
 }
 
 // Prints grid with a border
-void print_grid(const Dungeon *d){
+void print_grid(Dungeon *d){
     for(int i = 0; i < DUNGEON_WIDTH + 2; i++){
         printf("%c", HORIZONTAL_BORDER);
     }

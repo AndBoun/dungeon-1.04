@@ -50,8 +50,11 @@ static void initialize_distance_map(int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH])
 
 int create_non_tunneling_map(Dungeon *d, int pc_x, int pc_y) {
     // Initialize the distance map using the new function
+    debug_null(d);
     initialize_distance_map(d->non_tunneling_dist_map);
+    debug_null(d);
     find_all_paths(d, d->non_tunneling_dist_map, pc_x, pc_y, 0);
+    debug_null(d);
     return 0;
 }
 
@@ -88,11 +91,16 @@ static int find_all_paths(
     int dy[] = {-1,  0,  1, -1, 1,-1, 0, 1};
     int rows = DUNGEON_HEIGHT, cols = DUNGEON_WIDTH;
     PriorityQueue* pq = pq_create(rows * cols, rows * cols, copy_node_data, destroy_node_data);
-    
+
+    debug_null(d);
+
     // Initialize start node
     NodeData start_data = {start_x, start_y};
     pq_insert(pq, coord_to_key(start_x, start_y), &start_data, 0);
+    debug_null(d);
     dist_map[start_y][start_x] = 0;
+
+    debug_null(d);
     
     while (!pq_is_empty(pq)) {
         NodeData* current = pq_extract_min(pq);

@@ -106,7 +106,7 @@ bool place_stair(Dungeon *d, int x, int y, char stair);
 
 void print_room_info(const Dungeon *d);
 void print_hardness_info(const Dungeon *d);
-void print_grid(const Dungeon *d);
+void print_grid(Dungeon *d);
 
 int place_player_randomly(Dungeon *d);
 int place_player(Dungeon *d, int x, int y);
@@ -125,6 +125,8 @@ void destroy_dungeon(Dungeon *d);
 
 void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]);
 
+void start_gameplay(Dungeon *d);
 
+int debug_null(Dungeon *d);
 
 #endif
