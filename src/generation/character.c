@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <character.h>
 #include <dungeon.h>
+#include <dijkstra.h>
 
 int init_player(Player *p, int x, int y, char curr_cell) {
     p->x = x, p->y = y;
@@ -50,7 +51,7 @@ static Point get_random_coordinates(Dungeon *d){
     do {
         x = rand() % PLACABLE_WIDTH + 1;
         y = rand() % PLACABLE_HEIGHT + 1;
-    } while (d->grid[y][x].type == CORRIDOR || d->grid[y][x].type == ROCK);
+    } while (d->grid[y][x].type != FLOOR);
 
     Point p;
     p.x = x, p.y = y;
@@ -77,6 +78,11 @@ int place_monster_randomly(Dungeon *d, int idx){
 
 // Initialize monsters in the dungeon
 int initialize_monsters(Dungeon *d){
+
+    // Create distance maps for monster movement
+    create_non_tunneling_map(d, d->pc.x, d->pc.y);
+    create_tunneling_map(d, d->pc.x, d->pc.y);
+
     d->monsters = malloc(d->num_monsters * sizeof(Monster));
     d->num_monsters_alive = d->num_monsters;
     for (int i = 0; i < d->num_monsters; i++){

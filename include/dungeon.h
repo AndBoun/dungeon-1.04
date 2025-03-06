@@ -10,6 +10,8 @@
 
 #define INF 1000000000
 
+#define GAME_SPEED 250000
+
 // Character definitions for the Dungeon grid
 #define ROCK ' '
 #define FLOOR '.'
@@ -111,6 +113,7 @@ void print_grid(Dungeon *d);
 int place_player_randomly(Dungeon *d);
 int place_player(Dungeon *d, int x, int y);
 int move_player(Dungeon *d, int x, int y);
+int move_player_randomly(Dungeon *d);
 
 int place_monster_randomly(Dungeon *d, int idx);
 int initialize_monsters(Dungeon *d);
@@ -127,6 +130,6 @@ void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]);
 
 void start_gameplay(Dungeon *d);
 
-int debug_null(Dungeon *d);
+int print_x_grid(Dungeon *d);
 
 #endif

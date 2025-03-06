@@ -83,3 +83,31 @@ void print_dist_map(const int dist_map[DUNGEON_HEIGHT][DUNGEON_WIDTH]){
     }
     printf("\n");
 }
+
+// Print spaces out grid, with X as spaces
+// For debugging
+int print_x_grid(Dungeon *d){
+    int r = 0;
+    for (int y = 0; y < DUNGEON_HEIGHT; y++){
+        for (int x = 0; x < DUNGEON_WIDTH; x++){
+            char type = d->grid[y][x].type;
+
+            if (type != ROCK && type != CORRIDOR && type != FLOOR && type != UP_STAIRS && type != DOWN_STAIRS && type != PLAYER &&
+                type != '0' && type != '1' && type != '2' && type != '3' && type != '4' && type != '5' &&
+                type != '6' && type != '7' && type != '8' && type != '9' && type != 'A' && type != 'B' && type != 'C' &&
+                type != 'D' && type != 'E' && type != 'F'){
+                printf("x: %d, y: %d, char: %d \n", x, y, type);
+                r = -1;
+            }
+
+
+            if (type == ROCK){
+                printf("X ");
+                continue;
+            }
+            printf("%c ", type);
+        }
+        printf("\n");
+    }
+    return r;
+}

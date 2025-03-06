@@ -4,11 +4,13 @@
 
 #include <dungeon.h>
 #include <priority_queue.h>
+#include <character.h>
 
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+
 
 // Initialize a dungeon instance
 void init_dungeon(Dungeon *d) {
@@ -109,48 +111,60 @@ void destroy_dungeon(Dungeon *d){
     return;
 }
 
+// Calculate the timing for each entity based on their speed
+static int calculate_timing(int speed) {
+    return 1000 / speed;
+}
 
 void start_gameplay(Dungeon *d){
+    initialize_monsters(d);
     int num_entities = d->num_monsters + 1;
 
+    // Create a priority queue for the entities
+    // Only keys are needed, no data
     PriorityQueue *pq = pq_create(num_entities, num_entities, NULL, NULL);
 
-    // 0 = player, i + 1 = monster i
-    pq_insert(pq, 0, NULL, 0);
+    // Initialize the priority queue with the player and monsters
+    // entity = (0) is the player, PLAYER_ID
+    // entity = (i + 1), are the monsters, where i = index or monster_ID
+    pq_insert(pq, 0, NULL, PLAYER_ID);
     for (int i = 0; i < d->num_monsters; i++){
-        pq_insert(pq, i + 1, NULL, 0);
+        pq_insert(pq, i + 1, NULL, 0); // all entities start at time 0
     }
 
-    pq_extract_min(pq);
+    print_grid(d); // Print the grid before the game starts
+    printf("monsters: %d\n", d->num_monsters);
+    printf("alive: %d\n", d->num_monsters_alive);
 
-    while (d->pc.alive && d ->num_monsters_alive > 0){
-        usleep(250000);
+    while (d->pc.alive && d ->num_monsters_alive > 0) {
+        usleep(GAME_SPEED);
 
         int entity_id = pq_get_min_key(pq);
         int current_time = pq_get_priority(pq, entity_id);
         int next_time;
 
-        // Check if the entity is alive, if not, skip
-        if (d->monsters[entity_id - 1].alive == 0) {
-            pq_extract_min(pq);
-            continue;
-        }
-        
-        if (entity_id == 0) { // Player's turn
-            // No player movement yet, does nothing
-            move_player(d, d->pc.x, d->pc.y);
-            next_time = current_time + (1000 / d->pc.speed);
+
+        if (entity_id == PLAYER_ID) { // Player's turn
+            // move_player(d, d->pc.x, d->pc.y);
+            move_player_randomly(d);
+            next_time = current_time + calculate_timing(d->pc.speed);
         } else {
+            // Check if the entity is alive, if not, skip
+            if (!d->monsters[entity_id - 1].alive) {
+                pq_extract_min(pq);
+                continue;
+            }
             move_monster(&d->monsters[entity_id - 1], d);
-            next_time = current_time + (1000 / d->monsters[entity_id - 1].speed);
+            next_time = current_time + calculate_timing(d->monsters[entity_id - 1].speed);
         }
-        print_grid(d);
+        print_grid(d); // Print the grid after each turn
         
         // Reschedule entity's next turn
         pq_extract_min(pq);
         pq_insert(pq, entity_id, NULL, next_time);
     }
 
+    // Ending game message
     if (d->pc.alive == 0) printf("Player is dead.\n");
     if (d->num_monsters_alive == 0) printf("All monsters are dead.\n");
 

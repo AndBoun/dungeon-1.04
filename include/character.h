@@ -5,6 +5,7 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#define PLAYER_ID 0
 
 typedef struct {
     int intelligent, telepathy, tunneling, erratic;
