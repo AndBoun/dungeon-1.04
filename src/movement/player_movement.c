@@ -15,7 +15,7 @@ int move_player(Dungeon *d, int x, int y){
     if ((x == d->pc.x && y == d->pc.y) || 
         (d->grid[y][x].type == ROCK) || 
         (d->grid[y][x].hardness > 0)) {
-        printf("Player made an invalid move to (%d, %d)\n", x, y);
+        // printf("Player made an invalid move to (%d, %d)\n", x, y);
         return 0;
     }
 
@@ -25,11 +25,11 @@ int move_player(Dungeon *d, int x, int y){
         d->grid[y][x].type != UP_STAIRS &&
         d->grid[y][x].type != DOWN_STAIRS
     ){
-        printf("Player killed a monster: %c\n", d->grid[y][x].type);
+        // printf("Player killed a monster: %c\n", d->grid[y][x].type);
         kill_monster(d, x, y);
     }
 
-    printf("Player moved from (%d, %d) to (%d, %d)\n", d->pc.x, d->pc.y, x, y);
+    // printf("Player moved from (%d, %d) to (%d, %d)\n", d->pc.x, d->pc.y, x, y);
 
     d->grid[d->pc.y][d->pc.x].type = d->pc.curr_cell; // return the cell to its original type
     d->pc.curr_cell = d->grid[y][x].type; // update the current cell type
