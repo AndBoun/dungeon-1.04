@@ -166,11 +166,15 @@ void start_gameplay(Dungeon *d){
         pq_insert(pq, entity_id, NULL, next_time);
     }
 
-    print_grid(d); // Print the grid after the game ends
-
     // Ending game message
-    if (d->pc.alive == 0) printf("Player is dead.\n");
-    if (d->num_monsters_alive == 0) printf("All monsters are dead.\n");
+    if (d->pc.alive == 0){
+        printf("Player is dead.\n");
+    } 
+        
+    if (d->num_monsters_alive == 0) {
+        print_grid(d); // Print the grid after the game ends
+        printf("All monsters are dead.\n");
+    }
 
     pq_destroy(pq);
 }
