@@ -256,17 +256,17 @@ static int move_non_tunnel(Dungeon *d, Monster *m, int new_x, int new_y)
     ){
         if (d->grid[new_y][new_x].type == PLAYER){
             // kill player and return cell to original type
-            printf("Monster %c killed the player\n", m->symbol);
+            // printf("Monster %c killed the player\n", m->symbol);
             d->pc.alive = 0;
             d->grid[new_y][new_x].type = d->pc.curr_cell;
         }
         else{
-            printf("Monster %c killed a monster %c\n", m->symbol, d->grid[new_y][new_x].type);
+            // printf("Monster %c killed a monster %c\n", m->symbol, d->grid[new_y][new_x].type);
             kill_monster(d, new_x, new_y);
         }
     }
 
-    printf("Monster %c moved from (%d, %d) to (%d, %d)\n", m->symbol, m->x, m->y, new_x, new_y);
+    // printf("Monster %c moved from (%d, %d) to (%d, %d)\n", m->symbol, m->x, m->y, new_x, new_y);
 
     d->grid[m->y][m->x].type = m->curr_cell;   // return the cell to its original type
     m->curr_cell = d->grid[new_y][new_x].type; // update the current cell type to the new cell type
@@ -295,7 +295,7 @@ static int move_tunnel(Dungeon *d, Monster *m, int new_x, int new_y)
     else if (d->grid[new_y][new_x].hardness > 85)
     {
         d->grid[new_y][new_x].hardness -= 85;
-        printf("Monster %c is attempting to break through a rock\n", m->symbol);
+        // printf("Monster %c is attempting to break through a rock\n", m->symbol);
         return 0;
     }
 
@@ -350,7 +350,7 @@ int move_monster(Monster *m, Dungeon *d)
 
     // Check if the monster is trying to move to the same cell, if so, do nothing
     if (new_x == m->x && new_y == m->y){
-        printf("Monster %c is trying to move to the same cell (%d, %d)\n", m->symbol, new_x, new_y);
+        // printf("Monster %c is trying to move to the same cell (%d, %d)\n", m->symbol, new_x, new_y);
         return 0; // No movement
     }
 
