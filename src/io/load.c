@@ -104,6 +104,8 @@ static int load_hardness(LoadSave *ls, Dungeon *d) {
         cell->type = ROCK;
     }
 
+    free(hardness);
+
     return 0;
 }
 
